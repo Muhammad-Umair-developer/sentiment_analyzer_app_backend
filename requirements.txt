@@ -1,0 +1,11 @@
+tweepy
+pandas
+numpy
+nltk
+vaderSentiment
+transformers
+torch
+firebase-admin
+python-dateutil
+fastapi
+uvicorn
