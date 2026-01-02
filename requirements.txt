@@ -1,11 +1,24 @@
-tweepy
-pandas
-numpy
-nltk
-vaderSentiment
-transformers
-torch
-firebase-admin
-python-dateutil
-fastapi
-uvicorn
+# Core web framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+
+# Twitter API
+tweepy==4.14.0
+
+# Data processing
+pandas==2.1.4
+numpy==1.26.3
+python-dateutil==2.8.2
+
+# NLP and Sentiment Analysis
+nltk==3.8.1
+vaderSentiment==3.3.2
+transformers==4.36.2
+torch==2.1.2
+
+# Firebase / Firestore
+firebase-admin==6.3.0
+
+# Additional dependencies
+pydantic==2.5.3
+

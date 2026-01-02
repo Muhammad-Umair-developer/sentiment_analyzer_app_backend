@@ -3,12 +3,56 @@ from google.cloud.firestore_v1 import FieldFilter
 from firebase_admin import credentials, firestore
 import pandas as pd
 from datetime import datetime, timedelta
-from config import CACHE_HOURS
+from config import CACHE_HOURS, FIREBASE_CREDENTIALS, SERVICE_ACCOUNT_PATH
+import json
+import os
 
 # Initialize Firebase only once
-cred = credentials.Certificate("serviceAccountKey.json")
-if not firebase_admin._apps:
-    firebase_admin.initialize_app(cred)
+def initialize_firebase():
+    """Initialize Firebase with credentials from environment or file"""
+    if firebase_admin._apps:
+        return
+    
+    try:
+        # Priority 1: Use FIREBASE_CREDENTIALS environment variable (JSON string)
+        if FIREBASE_CREDENTIALS:
+            try:
+                cred_dict = json.loads(FIREBASE_CREDENTIALS)
+                cred = credentials.Certificate(cred_dict)
+                firebase_admin.initialize_app(cred)
+                print("Firebase initialized from environment variable")
+                return
+            except json.JSONDecodeError:
+                print("Warning: FIREBASE_CREDENTIALS is not valid JSON, trying as file path")
+                if os.path.exists(FIREBASE_CREDENTIALS):
+                    cred = credentials.Certificate(FIREBASE_CREDENTIALS)
+                    firebase_admin.initialize_app(cred)
+                    print(f"Firebase initialized from file: {FIREBASE_CREDENTIALS}")
+                    return
+        
+        # Priority 2: Use SERVICE_ACCOUNT_PATH file
+        if os.path.exists(SERVICE_ACCOUNT_PATH):
+            cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
+            firebase_admin.initialize_app(cred)
+            print(f"Firebase initialized from file: {SERVICE_ACCOUNT_PATH}")
+            return
+        
+        # Priority 3: Try default serviceAccountKey.json
+        if os.path.exists("serviceAccountKey.json"):
+            cred = credentials.Certificate("serviceAccountKey.json")
+            firebase_admin.initialize_app(cred)
+            print("Firebase initialized from serviceAccountKey.json")
+            return
+        
+        raise FileNotFoundError(
+            "No Firebase credentials found. Please set FIREBASE_CREDENTIALS environment variable "
+            "or provide serviceAccountKey.json file"
+        )
+    except Exception as e:
+        print(f"Error initializing Firebase: {e}")
+        raise
+
+initialize_firebase()
 
 db = firestore.client()
 

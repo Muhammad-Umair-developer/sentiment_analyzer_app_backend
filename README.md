@@ -1,135 +1,207 @@
-# Real-Time Sentiment Monitoring System
+# Real-Time Sentiment Monitoring System - Backend API
 
-A **Real-Time Sentiment Monitoring System** that analyzes live tweets using the **X (Twitter) API** and allows users to choose between **VADER** and **DistilBERT** for sentiment analysis. The application provides real-time insights through an interactive **Streamlit** interface and uses **Firebase** as the backend for data storage and caching.
+A **FastAPI-based backend** for real-time sentiment analysis of tweets using the **X (Twitter) API**. This backend provides REST API endpoints for Flutter mobile applications and uses **VADER** and **DistilBERT** models for sentiment analysis. Data is stored in **Firebase Firestore** for caching and persistence.
+
+> **🚀 NEW TO DEPLOYMENT?** → Start here: [START_HERE.md](START_HERE.md)
 
 ---
 
 ## 🚀 Features
 
-* 🔴 **Real-time tweet fetching** using the X API (via Tweepy)
-* 🧠 **Dual sentiment analysis models**:
-
-  * **VADER** (rule-based, fast)
-  * **DistilBERT** (transformer-based, deep learning)
-* 🎛️ **Streamlit-based interactive UI**
-* ☁️ **Firebase backend** to store:
-
-  * Search queries
-  * Usernames
-  * Tweets
-  * Sentiment scores from both models
-  * Timestamps
-* ⚡ **Smart caching mechanism**:
-
-  * If a user searches the same query again within **10 hours**, results are fetched from Firebase instead of calling the X API again
-  * Reduces API usage and improves response time
-* 📊 **Visual analytics** using Plotly and WordCloud
+- 🔴 **Real-time tweet fetching** using the X API (via Tweepy)
+- 🧠 **Dual sentiment analysis models**:
+  - **VADER** (rule-based, fast)
+  - **DistilBERT** (transformer-based, deep learning)
+- 🎯 **RESTful API** built with FastAPI
+- ☁️ **Firebase Firestore backend** to store:
+  - Search queries
+  - Usernames
+  - Tweets
+  - Sentiment scores from both models
+  - Timestamps
+- ⚡ **Smart caching mechanism**:
+  - If a user searches the same query within **10 hours**, results are fetched from Firebase
+  - Reduces API usage and improves response time
+- 📱 **Mobile-ready**: Optimized for Flutter Android/iOS apps
+- 🌐 **CORS enabled**: Works with cross-origin requests
+- 🚂 **Railway.app ready**: Easy deployment with environment variables
 
 ---
 
 ## 🏗️ System Architecture
 
 ```
-User (Streamlit UI)
+Flutter App (Android/iOS)
+        ↓
+FastAPI Backend (Railway.app)
         ↓
 X API (Tweepy)  ←── Cache Check (Firebase, 10 hours)
         ↓
 Sentiment Analysis (VADER / DistilBERT)
         ↓
-Firebase Database
-        ↓
-Visualization (Plots & WordClouds)
+Firebase Firestore Database
 ```
 
 ---
 
 ## 📦 Tech Stack
 
-* **Frontend**: Streamlit
-* **Backend**: Python + Firebase
-* **Database**: Firebase (Firestore / Realtime DB)
-* **APIs**: X (Twitter) API
-* **NLP Models**: VADER, DistilBERT
+- **Framework**: FastAPI + Uvicorn
+- **Database**: Firebase Firestore
+- **ML Models**: VADER, DistilBERT (Hugging Face Transformers)
+- **Deployment**: Railway.app
+- **API Client**: Tweepy (Twitter/X API v2)
+- **APIs**: X (Twitter) API
+- **NLP Models**: VADER, DistilBERT
 
 ---
 
-## 📋 Requirements
+## � Quick Deploy to Railway
 
-Install the required Python libraries using:
+**Want to deploy in 5 minutes?** Follow the [QUICKSTART.md](QUICKSTART.md) guide!
 
-```bash
-pip install tweepy streamlit pandas numpy nltk vaderSentiment transformers torch plotly wordcloud firebase-admin python-dateutil
-```
-
-### Dependencies List
-
-* tweepy
-* streamlit
-* pandas
-* numpy
-* nltk
-* vaderSentiment
-* transformers
-* torch
-* plotly
-* wordcloud
-* firebase-admin
-* python-dateutil
+For detailed instructions, see [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ---
 
-## 🔑 Setup Instructions
+## 📋 Local Development Setup
 
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/real-time-sentiment-monitoring.git
-cd real-time-sentiment-monitoring
+git clone https://github.com/your-username/sentiment-backend.git
+cd sentiment-backend
 ```
 
-### 2️⃣ X API Configuration
-
-* Create a developer account on **X (Twitter)**
-* Generate API keys and access tokens
-* Add them to your environment variables or configuration file
-
-### 3️⃣ Firebase Configuration
-
-* Create a Firebase project
-* Enable Firestore or Realtime Database
-* Generate a **service account key (JSON)**
-* Initialize Firebase in your project using `firebase-admin`
-
-```python
-import firebase_admin
-from firebase_admin import credentials
-
-cred = credentials.Certificate("firebase_key.json")
-firebase_admin.initialize_app(cred)
-```
-
----
-
-## ▶️ Run the Application
+### 2️⃣ Create Virtual Environment
 
 ```bash
-streamlit run app.py
+python -m venv venv
+
+# Windows
+venv\Scripts\activate
+
+# Linux/Mac
+source venv/bin/activate
 ```
 
-The app will open in your browser at:
+### 3️⃣ Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4️⃣ X API Configuration
+
+- Create a developer account on **X (Twitter)**
+- Generate API Bearer Token
+- Add to environment variables or `.env` file:
+
+````bash
+TWITTER_BEARER_TOKEN=your_bearer_token_here
+* Generate a **service account key (JSON)** - download as `serviceAccountKey.json`
+* Place the file in the project root OR set as environment variable
+
+```bash
+# Option 1: Use file (for local development)
+# Place serviceAccountKey.json in project root
+
+# Option 2: Use environment variable (for Railway)
+export FIREBASE_CREDENTIALS='{"type":"service_account",...}'
+````
+
+### 6️⃣ Download NLTK Data
+
+```bash
+python -c "import nltk; nltk.download('vader_lexicon'); nltk.download('punkt'); nltk.download('stopwords')"
+```
+
+### 7️⃣ Run Locally
+
+```bash
+uvicorn app:app --reload --host 0.0.0.0 --port 8000
+```
+
+The API will be available at:
 
 ```
-http://localhost:8501
+http://localhost:8000
+```
+
+### 8️⃣ Test the API
+
+Open browser:
+
+```
+http://localhost:8000/health
 ```
 
 ---
 
-## 📊 Output & Visualizations
+## 📱 Flutter Integration
 
-* Sentiment distribution (Positive / Neutral / Negative)
-* Comparative analysis between VADER & DistilBERT
-* Interactive charts using Plotly
-* WordCloud of most frequent terms in tweets
+See [flutter_integration_example.dart](flutter_integration_example.dart) for complete Flutter code examples.
+
+### Quick Flutter Setup
+
+1. **Add HTTP package** to `pubspec.yaml`:
+
+```yaml
+dependencies:
+  http: ^1.1.0
+```
+
+2. **Update API URL** in your Flutter app:
+
+```dart
+static const String baseUrl = 'https://your-app.railway.app';
+```
+
+3. **Add Internet Permission** (Android):
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+```
+
+---
+
+## 🚀 Deploy to Production
+
+### Deploy to Railway.app
+
+Follow these guides:
+
+- **Quick (5 min)**: [QUICKSTART.md](QUICKSTART.md)
+- **Detailed**: [DEPLOYMENT.md](DEPLOYMENT.md)
+- **Checklist**: [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)
+
+---
+
+## 📊 API Endpoints
+
+| Method | Endpoint   | Description                      |
+| ------ | ---------- | -------------------------------- |
+| GET    | `/`        | API information                  |
+| GET    | `/health`  | Health check                     |
+| POST   | `/fetch`   | Fetch tweets from Twitter        |
+| GET    | `/tweets`  | Get cached tweets with sentiment |
+| POST   | `/predict` | Run sentiment analysis           |
+
+### Example API Calls
+
+#### Fetch Tweets
+
+```bash
+curl -X POST http://localhost:8000/fetch \
+  -H "Content-Type: application/json" \
+  -d '{"query": "flutter", "limit": 50}'
+```
+
+#### Get Analyzed Tweets
+
+```bash
+curl "http://localhost:8000/tweets?query=flutter&limit=20"
+```
 
 ---
 
@@ -137,15 +209,15 @@ http://localhost:8501
 
 ### VADER
 
-* Rule-based sentiment analyzer
-* Fast and lightweight
-* Ideal for social media text
+- Rule-based sentiment analyzer
+- Fast and lightweight
+- Ideal for social media text
 
 ### DistilBERT
 
-* Transformer-based deep learning model
-* More accurate contextual understanding
-* Computationally heavier
+- Transformer-based deep learning model
+- More accurate contextual understanding
+- Computationally heavier
 
 Users can select the model directly from the UI.
 
@@ -153,21 +225,21 @@ Users can select the model directly from the UI.
 
 ## 🧪 Caching Logic (10 Hours)
 
-* Every query is stored with a timestamp in Firebase
-* When the same query is searched again:
+- Every query is stored with a timestamp in Firebase
+- When the same query is searched again:
 
-  * If the time difference ≤ **10 hours**, cached data is returned
-  * Otherwise, fresh tweets are fetched from X API
+  - If the time difference ≤ **10 hours**, cached data is returned
+  - Otherwise, fresh tweets are fetched from X API
 
 ---
 
 ## 📌 Future Enhancements
 
-* Live sentiment streaming dashboard
-* Support for multilingual sentiment analysis
-* User authentication with Firebase Auth
-* Topic-wise sentiment comparison
-* Deployment on cloud platforms
+- Live sentiment streaming dashboard
+- Support for multilingual sentiment analysis
+- User authentication with Firebase Auth
+- Topic-wise sentiment comparison
+- Deployment on cloud platforms
 
 ---
 
